@@ -25,3 +25,15 @@ find_package(Boost REQUIRED COMPONENTS
 add_executable(git main.cpp)
 target_link_libraries(git Boost::filesystem Boost::system)
 install(TARGETS git RUNTIME DESTINATION bin)
+set(install_prefix ${CMAKE_INSTALL_PREFIX})
+string(REPLACE "/" "\\\\" install_prefix ${install_prefix})
+install(CODE "execute_process(
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_INSTALL_PREFIX}/bin/gitk.exe
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_INSTALL_PREFIX}/bin/git-gui.exe
+  )"
+)
+install(CODE "execute_process(
+    COMMAND cmd.exe /c mklink /h ${install_prefix}\\\\bin\\\\gitk.exe ${install_prefix}\\\\bin\\\\git.exe
+    COMMAND cmd.exe /c mklink /h ${install_prefix}\\\\bin\\\\git-gui.exe ${install_prefix}\\\\bin\\\\git.exe
+  )"
+)

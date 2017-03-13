@@ -104,25 +104,54 @@ int wmain(int argc, wchar_t* argv[])
   }
 
   const fs::wpath prg(*(argv++));
-  std::wstring prg_name = git_dir + L"\\bin\\" + prg.filename().c_str();
+  std::wstring prg_name, script_name;
   std::vector<std::unique_ptr<wchar_t[]>> args;
+  prg_name = prg.filename().c_str();
+  if (prg_name == L"git.exe" || prg_name == L"git") {
+    prg_name = git_dir + L"\\bin\\" + prg.filename().c_str();
+  } else {
+    if (prg_name == L"gitk.exe" || prg_name == L"gitk") {
+      script_name = git_dir + L"\\bin\\gitk";
+    } else if (prg_name == L"git-gui.exe" || prg_name == L"git-gui") {
+      script_name = git_dir + L"\\libexec\\git-core\\git-gui";
+    } else {
+      std::cerr << "The program was called with an incorrect name" << std::endl;
+      return 1;
+    }
+    prg_name = msys2_base + L"\\mingw64\\bin\\wish.exe";
+  }
+
+  std::unique_ptr<wchar_t[]> pprg_name(new wchar_t[prg_name.length() + 1]);
+  wcscpy(pprg_name.get(), prg_name.c_str());
+  args.push_back(std::move(pprg_name));
+  std::unique_ptr<wchar_t[]> pscript_name;
+
+  if (script_name.length()) {
+    pscript_name.reset(new wchar_t[script_name.length() + 1]);
+    wcscpy(pscript_name.get(), script_name.c_str());
+    args.push_back(std::move(pscript_name));
+  }
+
   while(*argv) {
     std::unique_ptr<wchar_t[]> parg(new wchar_t[wcslen(*argv) + 1]);
     wcscpy(parg.get(), *argv);
     args.push_back(std::move(parg));
     ++argv;
   }
+
   wchar_t* nargs[args.size() + 1];
-  std::unique_ptr<wchar_t[]> pprg_name(new wchar_t[prg_name.length() + 1]);
-  wcscpy(pprg_name.get(), prg_name.c_str());
-  nargs[0] = pprg_name.get();
-  size_t i = 1;
+  size_t i = 0;
   for(auto it = args.begin(); it != args.end(); ++it) {
     nargs[i] = it->get();
     ++i;
   }
   nargs[i] = NULL;
-  intptr_t ret = _wspawnv(P_WAIT, prg_name.c_str(), nargs);
 
-  return ret;
+  if (script_name.length()) {
+    _wexecv(prg_name.c_str(), nargs);
+    return 1;
+  } else {
+    intptr_t ret = _wspawnv(P_WAIT, prg_name.c_str(), nargs);
+    return ret;
+  }
 }
