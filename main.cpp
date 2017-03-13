@@ -35,7 +35,6 @@ int wmain(int argc, wchar_t* argv[])
   errno_t err;
   size_t len;
 
-  std::wstring msys2_base;
   err = _wgetenv_s(&len, NULL, 0, L"MSYS2_BASE");
   if (err == 0 && len) {
     std::unique_ptr<wchar_t[]> wcp(new wchar_t[len]);
