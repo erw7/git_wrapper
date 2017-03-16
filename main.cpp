@@ -140,8 +140,8 @@ int wmain(int argc, wchar_t* argv[])
 
   wchar_t* nargs[args.size() + 1];
   size_t i = 0;
-  for(auto it = args.begin(); it != args.end(); ++it) {
-    nargs[i] = it->get();
+  for(const auto& ref: args) {
+    nargs[i] = ref.get();
     ++i;
   }
   nargs[i] = NULL;
