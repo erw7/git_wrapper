@@ -10,8 +10,8 @@
 #include <wchar.h>
 #include <errno.h>
 
-std::wstring msys2_base = L"C:\\msys64";
-std::wstring opt_base = msys2_base + L"\\opt\\mingw64";
+#define MSYS2_BASE L"C:\\msys64"
+#define OPT_BASE L"\\opt\\mingw64"
 
 typedef struct version_s {
   int major;
@@ -32,5 +32,7 @@ typedef struct git_path_s {
 } git_path_t;
 
 namespace fs = boost::filesystem;
+
+errno_t wgetenv_wrapper(const std::wstring& name, std::wstring& value);
 
 #endif

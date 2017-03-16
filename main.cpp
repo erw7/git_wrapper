@@ -3,16 +3,17 @@
 int wmain(int argc, wchar_t* argv[])
 {
   errno_t err;
-  size_t len;
+  std::wstring msys2_base;
+  std::wstring opt_base;
 
-  err = _wgetenv_s(&len, NULL, 0, L"MSYS2_BASE");
-  if (err == 0 && len) {
-    std::unique_ptr<wchar_t[]> wcp(new wchar_t[len]);
-    err = _wgetenv_s(&len, wcp.get(), len, L"MSYS2_BASE");
-    if (err == 0 && len) {
-      msys2_base = wcp.get();
-      opt_base = msys2_base + L"\\opt\\mingw64";
-    }
+  err = wgetenv_wrapper(L"MSYS2_BASE", msys2_base);
+  if (err != 0 || msys2_base.empty()) {
+    msys2_base = MSYS2_BASE;
+  }
+
+  err = wgetenv_wrapper(L"OPT_BASE", opt_base);
+  if (err != 0 || opt_base.empty()) {
+    opt_base = msys2_base + OPT_BASE;
   }
 
   std::vector<std::unique_ptr<git_path_t>> vec;
@@ -51,17 +52,8 @@ int wmain(int argc, wchar_t* argv[])
   std::wstring git_dir = (last - 1)->get()->path;
 
   std::wstring env_path;
-  err = _wgetenv_s(&len, NULL, 0, L"PATH");
-  if (err == 0 && len) {
-    std::unique_ptr<wchar_t[]> wcp(new wchar_t[len]);
-    err = _wgetenv_s(&len, wcp.get(), len, L"PATH");
-    if (err == 0 && len) {
-      env_path = wcp.get();
-    } else {
-      std::cerr << "Failed get PATH environment variable" << std::endl;
-      return 1;
-    }
-  }else {
+  err = wgetenv_wrapper(L"PATH", env_path);
+  if (err != 0 && env_path.empty()) {
     std::cerr << "Failed get PATH environment variable" << std::endl;
     return 1;
   }
@@ -123,4 +115,23 @@ int wmain(int argc, wchar_t* argv[])
     intptr_t ret = _wspawnv(P_WAIT, prg_name.c_str(), nargs);
     return ret;
   }
+}
+
+errno_t wgetenv_wrapper(const std::wstring& name, std::wstring& value)
+{
+  errno_t ret;
+  size_t len;
+
+  value = L"";
+  ret = _wgetenv_s(&len, NULL, 0, name.c_str());
+  if (ret || len == 0) {
+    return ret;
+  }
+  std::unique_ptr<wchar_t[]> upvalue(new wchar_t[len]);
+  ret = _wgetenv_s(&len, upvalue.get(), len, name.c_str());
+  if (ret || len == 0) {
+    return ret;
+  }
+  value = upvalue.get();
+  return ret;
 }
