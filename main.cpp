@@ -85,8 +85,8 @@ int wmain(int argc, wchar_t* argv[])
   std::unique_ptr<wchar_t[]> pprg_name(new wchar_t[prg_name.length() + 1]);
   wcscpy(pprg_name.get(), prg_name.c_str());
   args.push_back(std::move(pprg_name));
-  std::unique_ptr<wchar_t[]> pscript_name;
 
+  std::unique_ptr<wchar_t[]> pscript_name;
   if (script_name.length()) {
     pscript_name.reset(new wchar_t[script_name.length() + 1]);
     wcscpy(pscript_name.get(), script_name.c_str());
