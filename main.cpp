@@ -23,11 +23,10 @@ int wmain(int argc, wchar_t* argv[])
   boost::system::error_code b_err;
   const bool result = fs::exists(wpath, b_err);
   if (result && !b_err) {
-    BOOST_FOREACH(const fs::wpath& wp,
-        std::make_pair(fs::directory_iterator(wpath),
-          fs::directory_iterator())) {
+    for (const auto& wp :
+        boost::make_iterator_range(fs::directory_iterator(wpath), {})) {
       if (fs::is_directory(wp)
-          && std::regex_match(wp.wstring(), wmatch, wre)) {
+          && std::regex_match(wp.path().wstring(), wmatch, wre)) {
         std::unique_ptr<git_path_t> gp(new git_path_t);
         gp->path = wmatch.str(0);
         gp->ver.major = std::stoi(wmatch.str(1));
