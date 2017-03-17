@@ -92,11 +92,11 @@ int wmain(int argc, wchar_t* argv[])
     args.push_back(std::move(pscript_name));
   }
 
-  while(*argv) {
-    std::unique_ptr<wchar_t[]> parg(new wchar_t[wcslen(*argv) + 1]);
-    wcscpy(parg.get(), *argv);
+  auto range = boost::make_iterator_range_n(argv, argc - 1);
+  for (auto arg : range) {
+    std::unique_ptr<wchar_t[]> parg(new wchar_t[wcslen(arg) + 1]);
+    wcscpy(parg.get(), arg);
     args.push_back(std::move(parg));
-    ++argv;
   }
 
   wchar_t* nargs[args.size() + 1];
