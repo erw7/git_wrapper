@@ -65,7 +65,7 @@ int wmain(int argc, wchar_t* argv[])
 
   const fs::wpath prg(*(argv++));
   std::wstring prg_name, script_name;
-  std::vector<std::unique_ptr<wchar_t[]>> args;
+  std::vector<std::wstring> args;
   prg_name = prg.filename().c_str();
   if (prg_name == L"git.exe" || prg_name == L"git") {
     prg_name = git_dir + L"\\bin\\" + prg.filename().c_str();
@@ -81,32 +81,21 @@ int wmain(int argc, wchar_t* argv[])
     prg_name = msys2_base + L"\\mingw64\\bin\\wish.exe";
   }
 
-  size_t len;
-  len = prg_name.length() + 1;
-  std::unique_ptr<wchar_t[]> pprg_name(new wchar_t[len]);
-  wstrcpywca(pprg_name.get(), len, prg_name);
-  args.push_back(std::move(pprg_name));
+  args.push_back(prg_name);
 
-  std::unique_ptr<wchar_t[]> pscript_name;
   if (script_name.length()) {
-    len = script_name.length() + 1;
-    pscript_name.reset(new wchar_t[len]);
-    wstrcpywca(pscript_name.get(), len, script_name);
-    args.push_back(std::move(pscript_name));
+    args.push_back(script_name);
   }
 
   auto range = boost::make_iterator_range_n(argv, argc - 1);
   for (auto arg : range) {
-    len = wcslen(arg) + 1;
-    std::unique_ptr<wchar_t[]> parg(new wchar_t[len]);
-    wstrcpywca(parg.get(), len, arg);
-    args.push_back(std::move(parg));
+    args.push_back(arg);
   }
 
-  wchar_t* nargs[args.size() + 1];
+  const wchar_t* nargs[args.size() + 1];
   size_t i = 0;
   for(const auto& ref: args) {
-    nargs[i] = ref.get();
+    nargs[i] = ref.c_str();
     ++i;
   }
   nargs[i] = NULL;
@@ -137,12 +126,4 @@ errno_t wgetenv_wrapper(const std::wstring& name, std::wstring& value)
   }
   value = upvalue.get();
   return ret;
-}
-
-void wstrcpywca(wchar_t* dist, size_t len, std::wstring src)
-{
-  auto range = boost::make_iterator_range_n(dist, len);
-  for (const auto& wchar : range | boost::adaptors::indexed()) {
-    wchar.value() = src[wchar.index()];
-  }
 }

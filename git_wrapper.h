@@ -36,6 +36,5 @@ typedef struct git_path_s {
 namespace fs = boost::filesystem;
 
 errno_t wgetenv_wrapper(const std::wstring& name, std::wstring& value);
-void wstrcpywca(wchar_t* dist, size_t len, std::wstring src);
 
 #endif
