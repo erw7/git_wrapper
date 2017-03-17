@@ -81,21 +81,34 @@ int wmain(int argc, wchar_t* argv[])
     prg_name = msys2_base + L"\\mingw64\\bin\\wish.exe";
   }
 
-  std::unique_ptr<wchar_t[]> pprg_name(new wchar_t[prg_name.length() + 1]);
-  wcscpy(pprg_name.get(), prg_name.c_str());
+  size_t len;
+  len = prg_name.length() + 1;
+  std::unique_ptr<wchar_t[]> pprg_name(new wchar_t[len]);
+  if (wcscpy_s(pprg_name.get(), len, prg_name.c_str())){
+    std::cerr << "Failed wcscpy_s" << std::endl;
+    return 1;
+  }
   args.push_back(std::move(pprg_name));
 
   std::unique_ptr<wchar_t[]> pscript_name;
   if (script_name.length()) {
-    pscript_name.reset(new wchar_t[script_name.length() + 1]);
-    wcscpy(pscript_name.get(), script_name.c_str());
+    len = script_name.length() + 1;
+    pscript_name.reset(new wchar_t[len]);
+    if (wcscpy_s(pscript_name.get(), len, script_name.c_str())) {
+      std::cerr << "Failed wcscpy_s" << std::endl;
+      return 1;
+    }
     args.push_back(std::move(pscript_name));
   }
 
   auto range = boost::make_iterator_range_n(argv, argc - 1);
   for (auto arg : range) {
-    std::unique_ptr<wchar_t[]> parg(new wchar_t[wcslen(arg) + 1]);
-    wcscpy(parg.get(), arg);
+    len = wcslen(arg) + 1;
+    std::unique_ptr<wchar_t[]> parg(new wchar_t[len]);
+    if (wcscpy_s(parg.get(), len, arg)){
+      std::cerr << "Failed wcscpy_s" << std::endl;
+      return 1;
+    }
     args.push_back(std::move(parg));
   }
 
