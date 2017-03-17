@@ -84,20 +84,14 @@ int wmain(int argc, wchar_t* argv[])
   size_t len;
   len = prg_name.length() + 1;
   std::unique_ptr<wchar_t[]> pprg_name(new wchar_t[len]);
-  if (wcscpy_s(pprg_name.get(), len, prg_name.c_str())){
-    std::cerr << "Failed wcscpy_s" << std::endl;
-    return 1;
-  }
+  wstrcpywca(pprg_name.get(), len, prg_name);
   args.push_back(std::move(pprg_name));
 
   std::unique_ptr<wchar_t[]> pscript_name;
   if (script_name.length()) {
     len = script_name.length() + 1;
     pscript_name.reset(new wchar_t[len]);
-    if (wcscpy_s(pscript_name.get(), len, script_name.c_str())) {
-      std::cerr << "Failed wcscpy_s" << std::endl;
-      return 1;
-    }
+    wstrcpywca(pscript_name.get(), len, script_name);
     args.push_back(std::move(pscript_name));
   }
 
@@ -105,10 +99,7 @@ int wmain(int argc, wchar_t* argv[])
   for (auto arg : range) {
     len = wcslen(arg) + 1;
     std::unique_ptr<wchar_t[]> parg(new wchar_t[len]);
-    if (wcscpy_s(parg.get(), len, arg)){
-      std::cerr << "Failed wcscpy_s" << std::endl;
-      return 1;
-    }
+    wstrcpywca(parg.get(), len, arg);
     args.push_back(std::move(parg));
   }
 
@@ -146,4 +137,12 @@ errno_t wgetenv_wrapper(const std::wstring& name, std::wstring& value)
   }
   value = upvalue.get();
   return ret;
+}
+
+void wstrcpywca(wchar_t* dist, size_t len, std::wstring src)
+{
+  auto range = boost::make_iterator_range_n(dist, len);
+  for (const auto& wchar : range | boost::adaptors::indexed()) {
+    wchar.value() = src[wchar.index()];
+  }
 }
