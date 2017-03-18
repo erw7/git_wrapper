@@ -1,5 +1,13 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 project(git_wrapper)
+
+option(USE_COTIRE "Use cotire" OFF)
+
+if(USE_COTIRE)
+  set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cotire/CMake)
+  include(cotire)
+  set(COTIRE_MINIMUM_NUMBER_OF_TARGET_SOURCES 1)
+endif()
 
 get_filename_component(srcdir "${CMAKE_SOURCE_DIR}" REALPATH)
 get_filename_component(bindir "${CMAKE_BINARY_DIR}" REALPATH)
@@ -24,6 +32,10 @@ find_package(Boost REQUIRED COMPONENTS
              filesystem system)
 add_executable(git main.cpp)
 target_link_libraries(git Boost::filesystem Boost::system)
+if(USE_COTIRE)
+  cotire(git)
+endif()
+
 install(TARGETS git RUNTIME DESTINATION bin)
 set(install_prefix ${CMAKE_INSTALL_PREFIX})
 string(REPLACE "/" "\\\\" install_prefix ${install_prefix})
