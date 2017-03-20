@@ -43,7 +43,7 @@ int wmain(int argc, wchar_t* argv[])
     std::wcerr << L"Not exists " + opt_base << std::endl;
     return 1;
   }
-  std::sort(vec.begin(), vec.end(),
+  boost::sort(vec,
       [](const std::unique_ptr<git_path_t> &lhs,
         const std::unique_ptr<git_path_t> &rhs)
       -> bool {return *lhs < *rhs;});

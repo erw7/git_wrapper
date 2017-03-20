@@ -7,6 +7,7 @@
 #include <vector>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/range/algorithm/sort.hpp>
 #include <wchar.h>
 #include <errno.h>
 
