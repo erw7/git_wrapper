@@ -30,7 +30,7 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -municode")
 find_package(Boost REQUIRED COMPONENTS
              filesystem system)
-add_executable(git main.cpp)
+add_executable(git main.cpp git_wrapper.h)
 target_link_libraries(git Boost::filesystem Boost::system)
 if(USE_COTIRE)
   cotire(git)
