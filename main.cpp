@@ -100,7 +100,15 @@ int wmain(int argc, wchar_t* argv[])
 
   auto range = boost::make_iterator_range_n(argv, argc - 1);
   for (auto arg : range) {
-    args.push_back(arg);
+    std::wregex wre(L"(.*=)(.* .*)");
+    std::wsmatch wmatch;
+    std::wstring wsarg(arg);
+    if (std::regex_match(wsarg, wmatch, wre)) {
+      std::wstring quoted_arg(wmatch.str(1) + L"\"" + wmatch.str(2) + L"\"");
+      args.push_back(quoted_arg.c_str());
+    } else {
+      args.push_back(arg);
+    }
   }
 
   const wchar_t* nargs[args.size() + 1];
