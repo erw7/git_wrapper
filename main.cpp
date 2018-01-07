@@ -77,13 +77,16 @@ int wmain(int argc, wchar_t* argv[])
   const fs::wpath prg(*(argv++));
   std::wstring prg_name, script_name;
   std::vector<std::wstring> args;
+  std::wregex wre_git(L"git(\\.exe)*", std::regex_constants::icase);
+  std::wregex wre_gitk(L"gitk(\\.exe)*", std::regex_constants::icase);
+  std::wregex wre_git_gui(L"git-gui(\\.exe)*", std::regex_constants::icase);
   prg_name = prg.filename().c_str();
-  if (prg_name == L"git.exe" || prg_name == L"git") {
+  if (std::regex_match(prg_name, wre_git)) {
     prg_name = git_dir + L"\\bin\\" + prg.filename().c_str();
   } else {
-    if (prg_name == L"gitk.exe" || prg_name == L"gitk") {
+    if (std::regex_match(prg_name, wre_gitk)) {
       script_name = git_dir + L"\\bin\\gitk";
-    } else if (prg_name == L"git-gui.exe" || prg_name == L"git-gui") {
+    } else if (std::regex_match(prg_name, wre_git_gui)) {
       script_name = git_dir + L"\\libexec\\git-core\\git-gui";
     } else {
       std::wcerr << L"The program was called with an incorrect name: "  << prg_name << std::endl;
