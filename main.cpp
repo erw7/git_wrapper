@@ -36,7 +36,7 @@ int wmain(int argc, wchar_t* argv[])
       }
     }
     if (vec.empty()) {
-      std::cerr << "Git directory not found" << std::endl;
+      std::wcerr << L"Git directory not found" << std::endl;
       return 1;
     }
   } else {
@@ -53,7 +53,7 @@ int wmain(int argc, wchar_t* argv[])
   std::wstring env_path;
   err = wgetenv_wrapper(L"PATH", env_path);
   if (err != 0 && env_path.empty()) {
-    std::cerr << "Failed get PATH environment variable" << std::endl;
+    std::wcerr << L"Failed get PATH environment variable" << std::endl;
     return 1;
   }
 
@@ -70,7 +70,7 @@ int wmain(int argc, wchar_t* argv[])
     env_path = git_dir_bin + L";" + env_path;
   }
   if (_wputenv_s(L"PATH", env_path.c_str())) {
-    std::cerr << "Failed put PATH environment variable" << std::endl;
+    std::wcerr << L"Failed put PATH environment variable" << std::endl;
     return 1;
   }
 
@@ -86,7 +86,7 @@ int wmain(int argc, wchar_t* argv[])
     } else if (prg_name == L"git-gui.exe" || prg_name == L"git-gui") {
       script_name = git_dir + L"\\libexec\\git-core\\git-gui";
     } else {
-      std::cerr << "The program was called with an incorrect name" << std::endl;
+      std::wcerr << L"The program was called with an incorrect name: "  << prg_name << std::endl;
       return 1;
     }
     prg_name = msys2_base + L"\\mingw64\\bin\\wish.exe";
