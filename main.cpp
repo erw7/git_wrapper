@@ -60,14 +60,14 @@ int wmain(int argc, wchar_t* argv[])
   std::wstring git_dir_bin(git_dir + L"\\bin");
   std::wstring msys2_bin(msys2_base + L"\\usr\\bin");
   std::wstring mingw64_bin(msys2_base + L"\\mingw64\\bin");
-  if (env_path.find(git_dir_bin) == std::string::npos) {
-    env_path = git_dir_bin + L";" + env_path;
-  }
   if (env_path.find(msys2_bin) == std::string::npos) {
     env_path = msys2_bin + L";" + env_path;
   }
   if (env_path.find(mingw64_bin) == std::string::npos) {
     env_path = mingw64_bin + L";" + env_path;
+  }
+  if (env_path.find(git_dir_bin) == std::string::npos) {
+    env_path = git_dir_bin + L";" + env_path;
   }
   if (_wputenv_s(L"PATH", env_path.c_str())) {
     std::cerr << "Failed put PATH environment variable" << std::endl;
