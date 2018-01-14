@@ -88,6 +88,11 @@ int wmain(int argc, wchar_t* argv[])
       script_name = git_dir + L"\\bin\\gitk";
     } else if (std::regex_match(prg_name, wre_git_gui)) {
       script_name = git_dir + L"\\libexec\\git-core\\git-gui";
+      std::wstring env_git_pager;
+      err = wgetenv_wrapper(L"GIT_PAGER", env_git_pager);
+      if (err == 0 && !env_git_pager.empty()) {
+        _wputenv_s(L"GIT_PAGER", L"");
+      }
     } else {
       std::wcerr << L"The program was called with an incorrect name: "  << prg_name << std::endl;
       return 1;
