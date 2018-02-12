@@ -17,7 +17,7 @@ int wmain(int argc, wchar_t* argv[])
   }
 
   std::vector<std::unique_ptr<git_path_t>> vec;
-  std::wregex wre(L".*\\git-(\\d+)\\.(\\d+)\\.(\\d+)");
+  std::wregex wre(L".*\\git-(\\d+)\\.(\\d+)\\.(\\d+)(.(\\d))*");
   std::wsmatch wmatch;
   const fs::wpath wpath(opt_base);
   boost::system::error_code b_err;
@@ -32,6 +32,11 @@ int wmain(int argc, wchar_t* argv[])
         gp->ver.major = std::stoi(wmatch.str(1));
         gp->ver.minor = std::stoi(wmatch.str(2));
         gp->ver.revision = std::stoi(wmatch.str(3));
+        if (wmatch.size() == 6) {
+          gp->ver.win_ver = std::stoi(wmatch.str(5));
+        } else {
+          gp->ver.win_ver = 0;
+        }
         vec.push_back(std::move(gp));
       }
     }

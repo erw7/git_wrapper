@@ -18,9 +18,10 @@ typedef struct version_s {
   int major;
   int minor;
   int revision;
+  int win_ver;
   bool operator<(const version_s& rhs) const {
-    return major == rhs.major ? minor == rhs.minor ?
-      revision < rhs.revision : minor < rhs.minor : major < rhs.major;
+    return major == rhs.major ? minor == rhs.minor ? revision == rhs.revision ?
+      win_ver < rhs.win_ver : revision < rhs.revision : minor < rhs.minor : major < rhs.major;
   }
 } version_t;
 
